@@ -5,9 +5,16 @@ var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 
 module.exports = function (app) {
-    // Simple index route
+    // Root populates all saved articles
     app.get("/", function(req, res) {
-        res.render("index");
+        Article.find().populate("comments").exec(function(error, found) {
+            if (error) {
+                res.end();
+            }
+            else {
+                res.render("index", {articles: found})
+            }
+        })
     });
     // Route to scrape data from another site
     app.get("/scrape", function (req, res) {
@@ -30,20 +37,32 @@ module.exports = function (app) {
                 }
             })
         })
-        res.redirect("/");
+        res.send("saved");
+        // res.redirect("/");
     });
-    // Route to display saved articles
-    app.get("/saved", function(req, res) {
-        // Find all articles with our Article model
-        Article.find({}, function(error, doc) {
-            // Send any errors to the browser
+    // Route to post comments
+    app.post("/comment", function (req, res) {
+        var saveComment = new Comment({text: req.body.comment});
+        saveComment.save(function(error, doc) {
             if (error) {
-            res.send(error);
+                res.send(error);
             }
-            // Or send the doc to the browser
             else {
-            res.send(doc);
+
+
+                Article.findOneAndUpdate({}, {$push: {"comments": doc._id}}, {new: true}, function(error, newdoc) {
+                    if (error) {
+                        res.send(error);
+                    }
+                    else {
+                        console.log(newdoc);
+                        res.redirect("/");
+                    }
+                });
+
+                
             }
-        });
-    });
+        })
+    })
+
 }

@@ -14,7 +14,7 @@ var ArticleSchema = new Schema({
     link: {
         type: String,
         required: "Link is required",
-        trime: true,
+        trim: true,
         unique: true
     },
     comments: [{

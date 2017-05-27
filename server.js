@@ -13,14 +13,14 @@ var app = express();
 
 var PORT = process.env.PORT || 8080;
 
-app.engine("handlebars",exphbs({defaultLayout: "main"}));
-app.set("view engine","handlebars");
-
 // Use morgan and body parser with our app
 app.use(logger("dev"));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+
+app.engine("handlebars", exphbs({defaultLayout: "main"}));
+app.set("view engine", "handlebars");
 
 app.use(express.static('public'));
 
