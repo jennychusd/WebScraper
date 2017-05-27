@@ -25,7 +25,8 @@ module.exports = function (app) {
             var $ = cheerio.load(html);
             $(".cd__headline").each(function(i, element) {
                 var headline = $(this).children("a").text();
-                var link = $(this).children("a").attr("href");
+                var route = $(this).children("a").attr("href");
+                var link = "http://www.cnn.com" + route;
             
                 if (headline && link) {
                     var saveArticle = new Article({headline: headline, link: link});
@@ -37,8 +38,7 @@ module.exports = function (app) {
                 }
             })
         })
-        res.send("saved");
-        // res.redirect("/");
+        res.redirect("/");
     });
     // Route to post comments
     app.post("/comment", function (req, res) {
@@ -48,19 +48,14 @@ module.exports = function (app) {
                 res.send(error);
             }
             else {
-
-
                 Article.findOneAndUpdate({}, {$push: {"comments": doc._id}}, {new: true}, function(error, newdoc) {
                     if (error) {
                         res.send(error);
                     }
                     else {
-                        console.log(newdoc);
                         res.redirect("/");
                     }
                 });
-
-                
             }
         })
     })
